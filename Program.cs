@@ -34,8 +34,9 @@ namespace BackupCopyFiles
                 GetInformations();
                 return;
             }
-            
+
             Console.WriteLine("Initializing Backup Data");
+
             //get commandline args
             parameters = tools.GetCommandLineArgs(parameters);
 
@@ -44,19 +45,22 @@ namespace BackupCopyFiles
             parameters.TryGetValue("-pathSet", out target);
             parameters.TryGetValue("-backupfolder", out backupFolder);
             parameters.TryGetValue("-projectname", out projectname);
-            try
+
+            if (!IsPathValid())
             {
-                tools.CopyFilesRecursively(source, target + "\\" + backupFolder + "\\" + projectname);
-                Console.WriteLine("press 'return' to continue...");    
+                Console.WriteLine("Invalid path!\n");
+                GetInformations();
+                return;
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error: parsing cmd args");
-#if DEBUG
-                Console.WriteLine(ex.ToString());
-#endif
-            }
+
+            tools.CopyFilesRecursively(source, Path.Combine(target, backupFolder, projectname));
+            Console.WriteLine("press 'return' to continue...");
             Console.ReadLine();
+        }
+
+        private static bool IsPathValid()
+        {
+            return Directory.Exists(source) && Directory.Exists(target) ? true : false;
         }
 
         private static void GetInformations()
