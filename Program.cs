@@ -19,23 +19,23 @@ namespace BackupCopyFiles
         {
             if (args.Length == 0)
             {
-                GetInformations();
+                Console.WriteLine(GetInformations());
                 return;
             }
             else if (!args.Contains("-pathGet") || !args.Contains("-pathSet"))
             {
                 Console.WriteLine("You cannot continue. Please set any informations in commandline args!");
-                GetInformations();
+                Console.WriteLine(GetInformations());
                 return;
             }
             else if(args.Length % 2 == 1) //0 == gerade anzahl der elemente des arrays ---- 1 == ungerade anzahl der elemente des arrays
             {
                 Console.WriteLine("CommanlineArgs not valid. Please check and try again!");
-                GetInformations();
+                Console.WriteLine(GetInformations());
                 return;
             }
 
-            Console.WriteLine("Initializing Backup Data");
+            Console.WriteLine("Initializing Backup Data\n");
 
             //get commandline args
             parameters = tools.GetCommandLineArgs(parameters);
@@ -49,9 +49,11 @@ namespace BackupCopyFiles
             if (!IsPathValid())
             {
                 Console.WriteLine("Invalid path!\n");
-                GetInformations();
+                Console.WriteLine( GetInformations() );
                 return;
             }
+
+            Console.WriteLine("> source directory: {0}\n> target directory: {1}\n", source, target);
 
             tools.CopyFilesRecursively(source, Path.Combine(target, backupFolder, projectname));
             Console.WriteLine("press 'return' to continue...");
@@ -63,14 +65,14 @@ namespace BackupCopyFiles
             return Directory.Exists(source) && Directory.Exists(target) ? true : false;
         }
 
-        private static void GetInformations()
+        private static string GetInformations()
         {
-            Console.WriteLine("You have to add some commandline args\n");
-            Console.WriteLine("-pathGet \"PATH to source DIR\"");
-            Console.WriteLine("-pathSet \"PATH to destination DIR\"");
-            Console.WriteLine("optional:");
-            Console.WriteLine("-backupfolder \"name your main backup folder\"");
-            Console.WriteLine("-projectname \"name your current project\"");
+            return "You have to add some commandline args\n" +
+                "-pathGet \"PATH to source DIR\"\n" +
+                "-pathSet \"PATH to destination DIR\"\n" +
+                "optional:\n" +
+                "-backupfolder \"name your main backup folder\"\n" +
+                "-projectname \"name your current project\"";
         }
 
     }

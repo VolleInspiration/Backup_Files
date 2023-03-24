@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 
@@ -10,7 +9,6 @@ namespace BackupCopyFiles
     {
         public Dictionary<string,string> GetCommandLineArgs(Dictionary<string, string> parameters)
         {
-            Console.WriteLine("Get CommandLine Args\n");
             string[] CommandLineArgs = Environment.GetCommandLineArgs();
             parameters = new Dictionary<string, string>
             {
@@ -41,16 +39,18 @@ namespace BackupCopyFiles
 
         public void CopyFilesRecursively(string sourcePath, string targetPath)
         {
-            Console.WriteLine("Copy files - starting...\n");
+            Console.WriteLine("start copying files!\n");
             //Now Create all of the directories
             foreach (string dirPath in Directory.GetDirectories(sourcePath, "*", SearchOption.AllDirectories))
             {
                 Directory.CreateDirectory(dirPath.Replace(sourcePath, targetPath));
+                Console.Write("\r   working on it...");
             }
 
             int index = 0,
-                percentage = 0,
-                length = Directory.GetFiles(sourcePath, "*.*", SearchOption.AllDirectories).Length;
+                percentage = 0;
+
+            int lengthFiles = Directory.GetFiles(sourcePath, "*.*", SearchOption.AllDirectories).Length;
             long dirSize = GetDirectorySize(sourcePath);
             long copiedSize = 0L;
             FileInfo fi = null;
@@ -59,13 +59,13 @@ namespace BackupCopyFiles
             foreach (string newPath in Directory.GetFiles(sourcePath, "*.*", SearchOption.AllDirectories))
             {
                 ++index;
-                percentage = 100 * index / length;
+                percentage = 100 * index / lengthFiles;
                 fi = new FileInfo(newPath);
                 copiedSize += fi.Length;
                 File.Copy(newPath, newPath.Replace(sourcePath, targetPath), true);
-                Console.Write("\r{0}/{1}   {2}%   {3}MB copied", index, length, percentage, copiedSize / 1024 / 1024);
+                Console.Write("\r   {0}/{1}   {2}%   {3}MB copied", index, lengthFiles, percentage, copiedSize / 1024 / 1024);
             }
-            Console.WriteLine("\n\nCopy files - {0}MB - done!", dirSize / 1024 / 1024);
+            Console.WriteLine("\n\n   Copy files - {0}MB - done!", dirSize / 1024 / 1024);
         }
 
         private static long GetDirectorySize(string folderPath)
