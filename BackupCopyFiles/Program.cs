@@ -24,13 +24,13 @@ namespace BackupCopyFiles
             }
             else if (!args.Contains("-pathGet") || !args.Contains("-pathSet"))
             {
-                Console.WriteLine("You cannot continue. Please set any informations in commandline args!");
+                Console.WriteLine("You cannot continue. Please set any information in commandline args!");
                 Console.WriteLine(GetInformations());
                 return;
             }
             else if(args.Length % 2 == 1) //0 == gerade anzahl der elemente des arrays ---- 1 == ungerade anzahl der elemente des arrays
             {
-                Console.WriteLine("CommanlineArgs not valid. Please check and try again!");
+                Console.WriteLine("CommandlineArgs not valid. Please check and try again!");
                 Console.WriteLine(GetInformations());
                 return;
             }
