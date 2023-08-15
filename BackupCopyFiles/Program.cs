@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 
 namespace BackupCopyFiles
 {
-    class Program
+    public class Program
     {
         static Dictionary<string, string> parameters = new Dictionary<string, string>();
 
@@ -14,27 +15,14 @@ namespace BackupCopyFiles
             target = default, 
             backupFolder = default, 
             projectname = default;
-
+        
         public static void Main(string[] args)
         {
-            if (args.Length == 0)
-            {
-                Console.WriteLine(GetInformations());
-                return;
-            }
-            else if (!args.Contains("-pathGet") || !args.Contains("-pathSet"))
-            {
-                Console.WriteLine("You cannot continue. Please set any information in commandline args!");
-                Console.WriteLine(GetInformations());
-                return;
-            }
-            else if(args.Length % 2 == 1) //0 == gerade anzahl der elemente des arrays ---- 1 == ungerade anzahl der elemente des arrays
-            {
-                Console.WriteLine("CommandlineArgs not valid. Please check and try again!");
-                Console.WriteLine(GetInformations());
-                return;
-            }
+            var error = new ErrorLog();
 
+            if (!validateArgs(args)) 
+                return;
+            
             Console.WriteLine("Initializing Backup Data\n");
 
             //get commandline args
@@ -46,11 +34,15 @@ namespace BackupCopyFiles
             parameters.TryGetValue("-backupfolder", out backupFolder);
             parameters.TryGetValue("-projectname", out projectname);
 
-            if (!IsPathValid())
+            if(!IsPathValid(source))
             {
-                Console.WriteLine("Invalid path!\n");
-                Console.WriteLine( GetInformations() );
+                Console.WriteLine($"{error.InvalidPath} \n");
+                Console.WriteLine(GetInformations());
                 return;
+            }
+            if (!IsPathValid(target))
+            {
+                Directory.CreateDirectory(target);
             }
 
             Console.WriteLine("> source directory: {0}\n> target directory: {1}\n", source, target);
@@ -60,9 +52,34 @@ namespace BackupCopyFiles
             Console.ReadLine();
         }
 
-        private static bool IsPathValid()
+        private static bool validateArgs(string[] args)
         {
-            return Directory.Exists(source) && Directory.Exists(target) ? true : false;
+            var error = new ErrorLog();
+
+            if (args.Length == 0)
+            {
+                Console.WriteLine($"{error.FewArgs} \n");
+                Console.WriteLine(GetInformations());
+                return false;
+            }
+            else if (!args.Contains("-pathGet") || !args.Contains("-pathSet"))
+            {
+                Console.WriteLine($"{error.ArgsIncomplete} \n");
+                Console.WriteLine(GetInformations());
+                return false;
+            }
+            else if (args.Length % 2 == 1) //0 == gerade anzahl der elemente des arrays ---- 1 == ungerade anzahl der elemente des arrays
+            {
+                Console.WriteLine($"{error.ArgsInvalid} \n");
+                Console.WriteLine(GetInformations());
+                return false;
+            }
+            return true;
+        }
+
+        private static bool IsPathValid(string path)
+        {
+            return Directory.Exists(path);
         }
 
         private static string GetInformations()
